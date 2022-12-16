@@ -1,0 +1,7 @@
+---
+- hosts: "{{ host }}"
+  become: true
+  roles:
+    - create_users_groups
+  vars_files:
+    - files/users.yml

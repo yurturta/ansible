@@ -1,0 +1,33 @@
+---
+- name: Creating required groups
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - CAR-CE
+    - cop
+    - onecop-dev
+
+- name: Add the users 
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    groups: CAR-CE,onecop-dev
+    append: yes
+  with_items: "{{ users }}"
+
+- name: Ansible create .ssh directory for all users  
+  file:
+    path: /home/{{ item.username }}/.ssh
+    state: directory
+    mode: "0700"
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+  with_items: "{{ users }}"
+
+- name: Setup | authorized key upload for all users
+  authorized_key: 
+    user={{ item.username }}
+    key="{{ lookup('file', '/home/f01976/pb/keys/{{ item.username }}_authorized_keys') }}"
+  with_items: "{{users}}"
+
